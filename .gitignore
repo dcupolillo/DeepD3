@@ -138,3 +138,9 @@ examples/Training DeepD3 model UNet.ipynb
 
 # Wandb files
 wandb
+
+# Visual Studio Code settings
+.vscode/
+
+# Data files
+data/
