@@ -1,4 +1,4 @@
-import imageio as io
+import imageio.v2 as io
 from pathlib import Path
 import numpy as np
 
@@ -28,14 +28,11 @@ def dummy_stack(
     np.ndarray
         A 3D array representing the dummy z-stack with one plane.
     """
-    
-    assert bidimensional_image.ndim == 3, (
-        "The input image should have 3 dimensions: (height, width, channels)")
+    if bidimensional_image.ndim != 2:
+        raise ValueError("Input image must be a 2D array")
 
-    # Create a z-stack with 1 plane, and use the first channel,
-    # maybe you need to take the second
-
-    hacked_image = bidimensional_image[None, ..., 0]
+    # Create a z-stack with 1 plane
+    hacked_image = bidimensional_image[None, ...]
 
     if output_path is not None:
         io.mimwrite(output_path, hacked_image)

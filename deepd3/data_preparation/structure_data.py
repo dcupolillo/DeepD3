@@ -42,7 +42,13 @@ def create_d3data(
     if not (image.shape == dendrite.shape == spines.shape):
         raise ValueError("Stack, dendrite, and spines must have the same shape")
 
-    x, y, w, h, z_begin, z_end = 0, 0, image.shape[1], image.shape[0], 0, 1 
+    # For 3D stack with shape (depth, height, width)
+    depth = image.shape[0]
+    h = image.shape[1]  # Height
+    w = image.shape[2]  # Width
+    x, y = 0, 0
+    z_begin = 0
+    z_end = depth - 1
 
     data = {
         'stack': image,
@@ -57,7 +63,7 @@ def create_d3data(
         'Y': y,
         'Width': w,
         'Height': h,
-        'Depth': z_end-z_begin+1,
+        'Depth': depth,
         'Z_begin': z_begin,
         'Z_end': z_end,
         'Resolution_XY': resolution,
@@ -93,10 +99,13 @@ def create_d3set(
         Saves a .d3set file with the combined data and metadata.
     """
 
+    # Convert all items to string paths
+    files_list = [str(f) for f in files_list]
+
     if not all(fn.endswith('.d3data') for fn in files_list):
         raise ValueError("All input filenames should end with .d3data extension")
     
-    if not save_fn.endswith('.d3set'):
+    if not str(save_fn).endswith('.d3set'):
         raise ValueError("Output filename should end with .d3set extension")
 
     stacks = {}
@@ -105,10 +114,7 @@ def create_d3set(
     meta = pd.DataFrame()
 
     # For each dataset, add to set
-    for i in range(len(files_list)):
-        fn = files_list[i]
-        print(fn, "...")
-
+    for i, fn in enumerate(files_list):
         d = fl.load(fn)
 
         stacks[f"x{i}"] = d['data']['stack']

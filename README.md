@@ -1,7 +1,6 @@
 [![DeepD3 project website](https://img.shields.io/website-up-down-green-red/https/naereen.github.io.svg)](https://deepd3.forschung.fau.de/)
 [![Documentation Status](https://readthedocs.org/projects/deepd3/badge/?version=latest)](https://deepd3.readthedocs.io/en/latest/?badge=latest)
 
-
 # DeepD3
 
 We provide DeepD3, a framework for the **d**etection of **d**endritic spines and **d**endrites.
@@ -13,6 +12,18 @@ With DeepD3, you are able to
 * build 2D and 3D ROIs
 * export results to your favourite biomedical image analysis platform
 * use command-line or graphical user interfaces
+
+## Custom fork
+
+This is a fork of [DeepD3](https://github.com/ankilab/DeepD3), with additional training on 2D microscopy images, e.g. for 2-photon calcium imaging in slices. Thanks to @ankilab for the help.
+
+Modifications from original are stored in ``\data_preparation``, ``\examples`` and ``\training`` and include:
+
+- **2D Image Support**: added `dummy_stack` function to convert 2D images to pseudo-3D format
+- **Dataset Creation**: added `create_d3data` and ``create_d3set`` to properly handle 2D image metadata without relying on GUI. Furthermore, ``Create dataset.ipynb`` was added to create compatible data loaders.
+- **Custom training**: added ``Train custom model.ipynb`` to run a model training on 2D images.
+- **Training outcome visualization**: added ``Evaluate training.ipynb``.
+- Refractored ``utils.py`` for training-related functions.
 
 ## How to install and run DeepD3
 
@@ -59,12 +70,11 @@ Brief description:
 * Medium (16F) DeepD3 model trained on 94 nm (fixed) or a blend of resolutions (free)
 * Tiny (8F) DeepD3 mode trained on 94 nm (fixed) or a blend of resolutions (free)
 
-
 ## Workflow
 
 ### Train DeepD3 on your own dataset
 
-Use `deepd3-training` to start the GUI for generating training sets. 
+Use `deepd3-training` to start the GUI for generating training sets.
 
 For each of your training set, please provide
 
@@ -98,14 +108,13 @@ You only should ensure that your model allows arbitrary input and outputs two se
 
 Open the inference mode using `deepd3-inference`. Load your stack of choice (we currently support TIF stacks) and specify the XY and Z dimensions. Next, you can segment dendrites and dendritic spines using a DeepD3 model from [the model zoo]() by clicking on `Analyze -> Segment dendrite and spines`. Afterwards, you may clean the predictions by clicking on `Analyze -> Cleaning`. Finally, you may build 2D or 3D ROIs using the respective functions in `Analyze`. To test the 3D ROI building, double click in the stack to a region of interest. A window opens that allows you to play with the hyperparameters and segments 3D ROIs in real-time.
 
-All results can be exported to various file formats. For convenience, DeepD3 saves related data in its "proprietary" hdf5 file (that you can open using any hdf5 viewer/program/library). In particular, you may export the predictions as TIF files, the ROIs to ImageJ file format or a folder, the ROI map to a TIF file, or the ROI centroids to a file. 
+All results can be exported to various file formats. For convenience, DeepD3 saves related data in its "proprietary" hdf5 file (that you can open using any hdf5 viewer/program/library). In particular, you may export the predictions as TIF files, the ROIs to ImageJ file format or a folder, the ROI map to a TIF file, or the ROI centroids to a file.
 
 Most functions can be assessed using a batch command script located in `deepd3/inference/batch.py`.
 
-
 ## How to cite
 
-        @article{10.1371/journal.pcbi.1011774,
+    @article{10.1371/journal.pcbi.1011774,
             doi = {10.1371/journal.pcbi.1011774},
             author = {Fernholz, Martin H. P. AND Guggiana Nilo, Drago A. AND Bonhoeffer, Tobias AND Kist, Andreas M.},
             journal = {PLOS Computational Biology},
@@ -118,4 +127,3 @@ Most functions can be assessed using a batch command script located in `deepd3/i
             pages = {1-19},
             number = {2},
         }
-
