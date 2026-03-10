@@ -5,7 +5,6 @@ from external environments without requiring DeepD3 installation.
 """
 from __future__ import annotations
 import argparse
-import json
 import numpy as np
 from pathlib import Path
 import tifffile
@@ -26,21 +25,21 @@ def main():
     parser.add_argument(
         '-i', '--input',
         required=True,
-        type=str | Path,
+        type=str or Path,
         help='Path to input directory containing .tif images'
     )
 
     parser.add_argument(
         '-o', '--output',
         required=True,
-        type=str | Path,
+        type=str or Path,
         help='Path to output directory for predictions'
     )
 
     parser.add_argument(
         '-m', '--model',
         required=True,
-        type=str | Path,
+        type=str or Path,
         help='Path to DeepD3 model file (.h5)'
     )
 
