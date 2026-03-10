@@ -5,6 +5,7 @@ Created on Mon Oct 23 12:23:47 2023
 @author: dcupolillo
 """
 
+from __future__ import annotations
 import numpy as np
 from pathlib import Path
 import tensorflow as tf
@@ -14,9 +15,8 @@ from deepd3.inference.utils import unpad_predictions
 
 def inference(
         images: np.ndarray,
-        model_fn: str or Path,
-        original_dimensions: tuple or list = None,
-        device: str = '/cpu:0',
+        model_fn: str | Path,
+        device: str,
 ) -> tuple:
     """
     Perform neural network inference on input images to obtain pixel-wise segmentation.
@@ -32,9 +32,9 @@ def inference(
         - Single image: 2D array (H, W)
         - Batch of images: 3D array (B, H, W)
         Images should be padded to match model input size if needed.
-    model_fn : str or Path
+    model_fn : str | Path
         Path to the pre-trained TensorFlow model file (.h5).
-    original_dimensions : tuple or list, optional
+    original_dimensions : tuple | list, optional
         Original image dimensions (H, W) before padding. If provided, predictions
         are cropped to these dimensions. If None, returns full predictions.
     device : str, optional
@@ -53,13 +53,12 @@ def inference(
     """
 
     # Add batch dimension if single image
+    # Shape becomes (1, H, W)
     if images.ndim == 2:
         images = images[np.newaxis, ...]
 
     # Normalize to [-1, 1] range (matches training normalization)
-    images_min = images.min(axis=(1, 2), keepdims=True)
-    images_max = images.max(axis=(1, 2), keepdims=True)
-    images = (images - images_min) / (images_max - images_min) * 2 - 1
+    images = normalize_images(images)
 
     # Load model and run inference
     model_path = Path(model_fn)
@@ -68,15 +67,37 @@ def inference(
 
     with tf.device(device):
         model = load_model(model_path, compile=False)
-        dendrite_pred, spine_pred = model.predict(images[..., None])
+        dendrite_pred, spine_pred = model.predict(images[..., None]) # Add channel dimension for model input
 
     # Remove batch/channel dimensions
     dendrite_pred = dendrite_pred.squeeze()
     spine_pred = spine_pred.squeeze()
 
     # Optionally unpad to original dimensions
-    if original_dimensions is not None:
-        dendrite_pred = unpad_predictions(dendrite_pred, original_dimensions)
-        spine_pred = unpad_predictions(spine_pred, original_dimensions)
+    # if original_dimensions is not None:
+    #     dendrite_pred = unpad_predictions(dendrite_pred, original_dimensions)
+    #     spine_pred = unpad_predictions(spine_pred, original_dimensions)
 
     return spine_pred, dendrite_pred
+
+
+def normalize_images(images: np.ndarray) -> np.ndarray:
+    """
+    Normalize input images to the range [-1, 1].
+
+    Parameters
+    ----------
+    images : np.ndarray
+        Input images to normalize.
+
+    Returns
+    -------
+    np.ndarray
+        Normalized images in the same shape as input.
+    """
+
+    images_min = images.min(axis=(1, 2), keepdims=True)
+    images_max = images.max(axis=(1, 2), keepdims=True)
+    normalized_images = (images - images_min) / (images_max - images_min) * 2 - 1
+
+    return normalized_images

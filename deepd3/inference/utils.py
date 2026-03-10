@@ -8,7 +8,7 @@ def pad_image(
 ) -> np.ndarray:
     """
     Pad a single image to the target height and width.
-    Instrumental to batch rocessing, where images
+    Instrumental to batch processing, where images
     should have the same size.
 
     Building block to pad_images().
